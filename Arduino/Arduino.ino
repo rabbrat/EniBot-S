@@ -25,16 +25,19 @@ const int RADAR_READINGS_DELAY = 120;
 
 // H-BRIDGE CONFIG
 // ACELERATION
-const int FORWARD_ACELERATION = 10;
 const int BRAKE_ACELERATION = 10;
+const int BACKWARD_ACELERATION = 10;
+const int FORWARD_ACELERATION = 10;
 const int TURN_LEFT_ACELERATION = 10;
 const int TURN_RIGHT_ACELERATION = 10;
 // ACELERATION DELAY (µs)
-const int FORWARD_ACELERATION_DELAY = 5;
 const int BRAKE_ACELERATION_DELAY = 5;
+const int BACKWARD_ACELERATION_DELAY = 5;
+const int FORWARD_ACELERATION_DELAY = 5;
 const int TURN_LEFT_ACELERATION_DELAY = 5;
 const int TURN_RIGHT_ACELERATION_DELAY = 5;
 // MAX VELOCITY
+const int MAX_BACKWARD_VELOCITY = 100;
 const int MAX_FORWARD_VELOCITY = 100;
 const int MAX_TURN_LEFT_VELOCITY = 100;
 const int MAX_TURN_RIGHT_VELOCITY = 100;
@@ -112,19 +115,27 @@ float getUltrasonicDistance() {
   return pulseIn(ECHO_PIN, HIGH) / 58.2;
 }
 
-void moveForward() {
-  for(int i = 0; i <= MAX_FORWARD_VELOCITY; i+=FORWARD_ACELERATION) {
-    velocity = i;
-    moveForward(velocity);
-    delayMicroseconds(FORWARD_ACELERATION_DELAY);
-  }
-}
-
 void brake() {
   for(int i = velocity; i > 0; i-=BRAKE_ACELERATION) {
     velocity = i;
     brake(velocity);
     delayMicroseconds(BRAKE_ACELERATION_DELAY);
+  }
+}
+
+void moveBackward() {
+  for(int i = 0; i <= MAX_BACKWARD_VELOCITY; i+=BACKWARD_ACELERATION) {
+    velocity = i;
+    moveBackward(velocity);
+    delayMicroseconds(BACKWARD_ACELERATION_DELAY);
+  }
+}
+
+void moveForward() {
+  for(int i = 0; i <= MAX_FORWARD_VELOCITY; i+=FORWARD_ACELERATION) {
+    velocity = i;
+    moveForward(velocity);
+    delayMicroseconds(FORWARD_ACELERATION_DELAY);
   }
 }
 
@@ -144,21 +155,30 @@ void turnRight() {
   }
 }
 
-void moveForward(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
-  digitalWrite(IN_A1_PIN, HIGH);
-  digitalWrite(IN_A2_PIN, LOW);
-  digitalWrite(IN_B1_PIN, HIGH);
-  digitalWrite(IN_B2_PIN, LOW);
-}
-
 void brake(int velocity) {
   analogWrite(ENABLE_A_PIN, velocity);
   analogWrite(ENABLE_B_PIN, velocity);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, LOW);
+  digitalWrite(IN_B2_PIN, LOW);
+}
+
+void moveBackward(int velocity) {
+  analogWrite(ENABLE_A_PIN, velocity);
+  analogWrite(ENABLE_B_PIN, velocity);
+  digitalWrite(IN_A1_PIN, LOW);
+  digitalWrite(IN_A2_PIN, HIGH);
+  digitalWrite(IN_B1_PIN, LOW);
+  digitalWrite(IN_B2_PIN, HIGH);
+}
+
+void moveForward(int velocity) {
+  analogWrite(ENABLE_A_PIN, velocity);
+  analogWrite(ENABLE_B_PIN, velocity);
+  digitalWrite(IN_A1_PIN, HIGH);
+  digitalWrite(IN_A2_PIN, LOW);
+  digitalWrite(IN_B1_PIN, HIGH);
   digitalWrite(IN_B2_PIN, LOW);
 }
 
