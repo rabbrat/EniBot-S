@@ -1,2 +1,2 @@
 # EniBot-S
-BumperBot for Arduino
+BumperBot for Arduino & Spartan Mojo 6 FPGA.
