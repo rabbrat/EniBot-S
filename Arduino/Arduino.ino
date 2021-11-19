@@ -20,12 +20,16 @@
 #define ENABLE_A_PIN 13
 
 // TURN-ON/OFF BUTTON CONFIG
-const int THRESHOLD = 250;
+const int TURN_THRESHOLD = 250;
 
 // RADAR CONFIG
 const int RADAR_STEPS = 15;
 const int RADAR_READINGS = 12;
 const int RADAR_READINGS_DELAY = 120;
+
+// TCRT CONFIG
+const int LEFT_TCRT_THRESHOLD = 150;
+const int RIGHT_TCRT_THRESHOLD = 150;
 
 // H-BRIDGE CONFIG
 // ACELERATION
@@ -51,14 +55,18 @@ Servo radarServo;
 
 // GLOBAL VARIABLES
 volatile boolean canceled = true;
-long debounceTime = 0;
+volatile boolean leftTCRT = false;
+volatile boolean rightTCRT = false;
+long leftTCRTMillis = 0;
+long rightTCRTMillis = 0;
+long turnMillis = 0;
 int velocity = 0;
 
 void setup() {
   // INPUT PIN DEFINITION
   pinMode(TURN_BTN_PIN, INPUT_PULLUP);
-  pinMode(TCRT_LEFT_PIN, INPUT);
-  pinMode(TCRT_RIGHT_PIN, INPUT);
+  pinMode(TCRT_LEFT_PIN, INPUT_PULLUP);
+  pinMode(TCRT_RIGHT_PIN, INPUT_PULLUP);
   pinMode(ECHO_PIN, INPUT);
 
   // OUTPUT PIN DEFINITION
@@ -72,10 +80,12 @@ void setup() {
   pinMode(ENABLE_A_PIN, OUTPUT);
 
   // ATTACH INTERRUPT
-  attachInterrupt(digitalPinToInterrupt(TURN_BTN_PIN), turn, FALLING);
-  radarServo.attach(RADAR_SERVO_PIN);
+  attachInterrupt(digitalPinToInterrupt(TURN_BTN_PIN), updateTurn, FALLING);
+  attachInterrupt(digitalPinToInterrupt(TCRT_LEFT_PIN), updateLeftTCRT, RISING);
+  attachInterrupt(digitalPinToInterrupt(TCRT_RIGHT_PIN), updateRightTCRT, RISING);
     
   // INITIALIZATION
+  radarServo.attach(RADAR_SERVO_PIN);
   radarServo.write(0);
 
   // SERIAL COM
@@ -85,6 +95,7 @@ void setup() {
 void loop() {
   
   if(canceled) {
+    // Warning: Compatible only with ARDUINO MEGA 2560
     LowPower.idle(SLEEP_FOREVER, ADC_OFF, TIMER5_ON, TIMER4_OFF, TIMER3_ON, TIMER2_ON, TIMER1_ON, TIMER0_ON, SPI_OFF, USART3_OFF, USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
   } else {
     float distances[RADAR_READINGS];
@@ -235,11 +246,23 @@ void printRadar(int startAngle, int endAngle, float* distances, int arrSize) {
   Serial.println("]");
 }
 
-void turn() {
-
-  if(millis() - debounceTime > THRESHOLD) {
-    canceled = !canceled;
-    debounceTime = millis();
+void updateLeftTCRT() {
+  if(millis() - leftTCRTMillis > LEFT_TCRT_THRESHOLD) {
+    leftTCRT = true;
+    leftTCRTMillis = millis();
   }
+}
 
+void updateRightTCRT() {
+  if(millis() - rightTCRTMillis > RIGHT_TCRT_THRESHOLD) {
+    rightTCRT = true;
+    rightTCRTMillis = millis();
+  }
+}
+
+void updateTurn() {
+  if(millis() - turnMillis > TURN_THRESHOLD) {
+    canceled = !canceled;
+    turnMillis = millis();
+  }
 }
