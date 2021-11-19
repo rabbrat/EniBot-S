@@ -1,15 +1,16 @@
+#include<LowPower.h>
 #include<Servo.h>
 
 // TURN-ON/OFF BUTTON
-#define TURN_BTN_PIN 2
-// TCRT5000 MODULES
-#define TCRT_LEFT_PIN 3
-#define TCRT_RIGHT_PIN 4
+#define TURN_BTN_PIN 3
 // HC-SR04
-#define ECHO_PIN 5
-#define TRIG_PIN 6
+#define ECHO_PIN 4
+#define TRIG_PIN 5
 // SG90
-#define RADAR_SERVO_PIN 7
+#define RADAR_SERVO_PIN 6
+// TCRT5000 MODULES
+#define TCRT_LEFT_PIN 20
+#define TCRT_RIGHT_PIN 21
 // L298N
 #define ENABLE_B_PIN 8
 #define IN_A1_PIN 9
@@ -17,6 +18,9 @@
 #define IN_B1_PIN 11
 #define IN_B2_PIN 12
 #define ENABLE_A_PIN 13
+
+// TURN-ON/OFF BUTTON CONFIG
+const int THRESHOLD = 250;
 
 // RADAR CONFIG
 const int RADAR_STEPS = 15;
@@ -46,14 +50,13 @@ const int MAX_TURN_RIGHT_VELOCITY = 100;
 Servo radarServo;
 
 // GLOBAL VARIABLES
-int velocity;
+volatile boolean canceled = true;
+long debounceTime = 0;
+int velocity = 0;
 
 void setup() {
-  // ATTACH
-  radarServo.attach(RADAR_SERVO_PIN);
-
   // INPUT PIN DEFINITION
-  pinMode(TURN_BTN_PIN, INPUT);
+  pinMode(TURN_BTN_PIN, INPUT_PULLUP);
   pinMode(TCRT_LEFT_PIN, INPUT);
   pinMode(TCRT_RIGHT_PIN, INPUT);
   pinMode(ECHO_PIN, INPUT);
@@ -67,22 +70,31 @@ void setup() {
   pinMode(IN_B1_PIN, OUTPUT);
   pinMode(IN_B2_PIN, OUTPUT);
   pinMode(ENABLE_A_PIN, OUTPUT);
+
+  // ATTACH INTERRUPT
+  attachInterrupt(digitalPinToInterrupt(TURN_BTN_PIN), turn, FALLING);
+  radarServo.attach(RADAR_SERVO_PIN);
     
   // INITIALIZATION
   radarServo.write(0);
-  
+
   // SERIAL COM
   Serial.begin(9600);
 }
 
 void loop() {
-  float distances[RADAR_READINGS];
-  float distances1[RADAR_READINGS];
-
-  getRadar(0, 180, distances);
-  printRadar(0, 180, distances, RADAR_READINGS);
-  getRadar(180, 0, distances1);
-  printRadar(180, 0, distances1, RADAR_READINGS);
+  
+  if(canceled) {
+    LowPower.idle(SLEEP_FOREVER, ADC_OFF, TIMER5_ON, TIMER4_OFF, TIMER3_ON, TIMER2_ON, TIMER1_ON, TIMER0_ON, SPI_OFF, USART3_OFF, USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
+  } else {
+    float distances[RADAR_READINGS];
+    float distances1[RADAR_READINGS];
+    
+    getRadar(0, 180, distances);
+    printRadar(0, 180, distances, RADAR_READINGS);
+    getRadar(180, 0, distances1);
+    printRadar(180, 0, distances1, RADAR_READINGS);
+  }
 }
 
 float* getRadar(int startAngle, int endAngle, float* distances) {
@@ -91,6 +103,7 @@ float* getRadar(int startAngle, int endAngle, float* distances) {
 
   if(startAngle < endAngle) {
     for(pos = startAngle; pos <= endAngle; pos+=RADAR_STEPS) {
+      if(canceled) break;
       distances[i] = getUltrasonicDistance();
       radarServo.write(pos);
       i++;
@@ -98,6 +111,7 @@ float* getRadar(int startAngle, int endAngle, float* distances) {
     }    
   } else {
     for(pos = startAngle; pos >= endAngle; pos-=RADAR_STEPS) {
+      if(canceled) break;
       distances[i] = getUltrasonicDistance();
       radarServo.write(pos);
       i++;
@@ -139,18 +153,18 @@ void moveForward() {
   }
 }
 
-void turnLeft() {
+void moveLeft() {
   for(int i = 0; velocity <= MAX_TURN_LEFT_VELOCITY; velocity+=TURN_LEFT_ACELERATION) { 
     velocity = i;
-    turnLeft(velocity);
+    moveLeft(velocity);
     delayMicroseconds(TURN_LEFT_ACELERATION_DELAY);
   }
 }
 
-void turnRight() {
+void moveRight() {
   for(int i = 0; velocity <= MAX_TURN_RIGHT_VELOCITY; velocity+=TURN_RIGHT_ACELERATION) {
     velocity = i;
-    turnRight(velocity);
+    moveRight(velocity);
     delayMicroseconds(TURN_RIGHT_ACELERATION_DELAY);
   }
 }
@@ -182,7 +196,7 @@ void moveForward(int velocity) {
   digitalWrite(IN_B2_PIN, LOW);
 }
 
-void turnLeft(int velocity) {
+void moveLeft(int velocity) {
   analogWrite(ENABLE_A_PIN, velocity);
   analogWrite(ENABLE_B_PIN, velocity);
   digitalWrite(IN_A1_PIN, HIGH);
@@ -191,7 +205,7 @@ void turnLeft(int velocity) {
   digitalWrite(IN_B2_PIN, HIGH);
 }
 
-void turnRight(int velocity) {
+void moveRight(int velocity) {
   analogWrite(ENABLE_A_PIN, velocity);
   analogWrite(ENABLE_B_PIN, velocity);
   digitalWrite(IN_A1_PIN, LOW);
@@ -201,6 +215,8 @@ void turnRight(int velocity) {
 }
 
 void printRadar(int startAngle, int endAngle, float* distances, int arrSize) {
+
+  if(canceled) return;
   Serial.print("Radar");
   Serial.print("(");
   Serial.print(startAngle);
@@ -217,4 +233,13 @@ void printRadar(int startAngle, int endAngle, float* distances, int arrSize) {
     else Serial.print(" cm");
   }
   Serial.println("]");
+}
+
+void turn() {
+
+  if(millis() - debounceTime > THRESHOLD) {
+    canceled = !canceled;
+    debounceTime = millis();
+  }
+
 }
