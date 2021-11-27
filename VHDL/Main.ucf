@@ -1,0 +1,4 @@
+NET "clk" LOC = "P56";
+NET "led" LOC = "P134";
+NET "echo" LOC = "P79";
+NET "trig" LOC = "P78";
