@@ -1,4 +1,3 @@
-#include<LowPower.h>
 #include<Servo.h>
 
 // TURN-ON/OFF BUTTON
@@ -95,45 +94,8 @@ void setup() {
 
 void loop() {
   
-  if(canceled) {
-    // Warning: Compatible only with ARDUINO MEGA 2560
-    LowPower.idle(SLEEP_FOREVER, ADC_OFF, TIMER5_ON, TIMER4_ON, TIMER3_ON, TIMER2_ON, TIMER1_ON, TIMER0_ON, SPI_OFF, USART3_OFF, USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
-  } else {
-    float distances[RADAR_READINGS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    getRadar(0, 180, distances);
-    printRadar(0, 180, distances, RADAR_READINGS);
-
-    int index = -1;
-    float least = -1;
-    for(int i = 0; i < RADAR_READINGS; i++) {
-      float distance = distances[i];
-      if(distance > MAX_RADAR_DISTANCE) continue;
-      else if(least = -1 || distance < least) {
-        index = i;
-        least = distance;
-      }
-    }
-    Serial.print("Least at index ");
-    Serial.print("(");
-    Serial.print(index);
-    Serial.print("): ");
-    Serial.println(least);
-
-    if(index == -1 && least == -1) {
-      moveRight();
-      delay(500);
-    } else if(index >= 5 || index <= 7) {
-      moveForward();
-      delay(150);
-    } else if(index < 5) {
-      moveRight();
-      delay(150);
-    } else if(index > 7) {
-      moveLeft();
-      delay(150);
-    } 
-  }
+  Serial.println(getUltrasonicDistance());
+  delay(1000);
 }
 
 float* getRadar(int startAngle, int endAngle, float* distances) {
