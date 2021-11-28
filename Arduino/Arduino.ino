@@ -72,6 +72,7 @@ void setup() {
   // OUTPUT PIN DEFINITION
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(RADAR_SERVO_PIN, OUTPUT);
+  
   pinMode(ENABLE_B_PIN, OUTPUT);
   pinMode(IN_A1_PIN, OUTPUT);
   pinMode(IN_A2_PIN, OUTPUT);
@@ -93,9 +94,19 @@ void setup() {
 }
 
 void loop() {
-  
-  Serial.println(getUltrasonicDistance());
-  delay(1000);
+  moveForward();
+  delay(4000);
+  brake();
+  delay(4000);
+  moveRight();
+  delay(4000);
+  brake();
+  moveLeft();
+  delay(4000);
+  brake();
+  moveBackward();
+  delay(4000);
+  brake();
 }
 
 float* getRadar(int startAngle, int endAngle, float* distances) {
@@ -130,6 +141,7 @@ float getUltrasonicDistance() {
   return pulseIn(ECHO_PIN, HIGH) / 58.2;
 }
 
+/*
 void brake() {
   for(int i = velocity; i > 0; i-=BRAKE_ACELERATION) {
     velocity = i;
@@ -168,47 +180,47 @@ void moveRight() {
     moveRight(velocity);
     delayMicroseconds(TURN_RIGHT_ACELERATION_DELAY);
   }
-}
+}*/
 
-void brake(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void brake() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, LOW);
 }
 
-void moveBackward(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveBackward() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, HIGH);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, HIGH);
 }
 
-void moveForward(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveForward() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, HIGH);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, HIGH);
   digitalWrite(IN_B2_PIN, LOW);
 }
 
-void moveLeft(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveLeft() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, HIGH);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, HIGH);
 }
 
-void moveRight(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveRight() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, HIGH);
   digitalWrite(IN_B1_PIN, HIGH);
