@@ -17,27 +17,25 @@ component Counter is
 		 output : out STD_LOGIC_VECTOR(n-1 downto 0)
 		);
 end component;
-	
-	signal reset_counter : std_logic;
-	signal output_counter : std_logic_vector(23 downto 0);
+	signal output_signal : STD_LOGIC_VECTOR(23 downto 0);	
+	signal reset_signal : STD_LOGIC;
 begin
-	microseconds : Counter generic map(24) port map(clk, '1', reset_counter, output_counter);
-	process(clk, output_counter)
-	constant ms250 : std_logic_vector(23 downto 0) := "101111101011110000100000";
-	constant ms250And100us : std_logic_vector(23 downto 0) := "101111101100111110101000";
+	nanoseconds : Counter generic map(24) port map(clk, '1', reset_signal, output_signal);
+	process(clk, output_signal)
+	constant ms100 : STD_LOGIC_VECTOR(23 downto 0) := "010011000100101101000000";
+	constant ms100And20us : STD_LOGIC_VECTOR(23 downto 0) := "010011000100110100110011";
 	begin
-		if(output_counter > ms250 and output_counter < ms250And100us) then
+		if(output_signal > ms100  and output_signal < ms100And20us) then
 			trig <= '1';
 		else
 			trig <= '0';
 		end if;
 			
-		if(output_counter = ms250And100us or output_counter="XXXXXXXXXXXXXXXXXXXXXXXX") then
-			reset_counter <= '0';
+		if(output_signal = ms100And20us or output_signal="XXXXXXXXXXXXXXXXXXXXXXXX") then
+			reset_signal <= '0';
 		else
-			reset_counter <= '1';
+			reset_signal <= '1';
 		end if;
 	end process;
 	
 end Behavioral;
-

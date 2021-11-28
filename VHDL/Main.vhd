@@ -16,19 +16,15 @@ component HCSR04 is
     Port ( clk : in  STD_LOGIC;
            echo : in  STD_LOGIC;
            trig : out  STD_LOGIC;
-			  distance : out positive);
+			  obstacle : out STD_LOGIC);
 end component;
 	signal blink : STD_LOGIC;
-	signal distance : positive;
+	signal obstacle : STD_LOGIC;
 begin
-	ultrasonic : HCSR04 port map(clk => clk, echo => echo, trig => trig, distance => distance);
-	process(distance)
+	ultrasonic : HCSR04 port map(clk, echo, trig, obstacle);
+	process(obstacle)
 	begin
-		if distance > 5 then
-			blink <= '1';
-		else
-			blink <= '0';
-		end if;
+		blink <= obstacle;
 	end process;
 	led <= blink;
 end Behavioral;
