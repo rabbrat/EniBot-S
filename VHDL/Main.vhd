@@ -6,18 +6,25 @@ entity Main is
 		clk : in  STD_LOGIC;
 		echo : in  STD_LOGIC;
 		trig : out  STD_LOGIC;
-      led : out  STD_LOGIC
+      led : out  STD_LOGIC;
+		servo_pwm : out  STD_LOGIC
 	);
 end Main;
 
 architecture Behavioral of Main is
-	signal blink : STD_LOGIC;
-	signal obstacle : STD_LOGIC;
+
+component Radar is
+    Port ( 
+			clk : in STD_LOGIC;
+			echo : in STD_LOGIC;
+			trig : out STD_LOGIC;
+			pwm : out STD_LOGIC
+	 );
+end component;
+	signal servo_pwm_signal : STD_LOGIC;
+	signal trig_signal : STD_LOGIC;
 begin
-	radar : Radar port map(clk, trig, echo);
-	process(obstacle)
-	begin
-		blink <= obstacle;
-	end process;
-	led <= blink;
+	detector_radar : Radar port map(clk, echo, trig_signal, servo_pwm_signal);
+	trig <= trig_signal;
+	servo_pwm <= servo_pwm_signal;
 end Behavioral;

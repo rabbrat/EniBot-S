@@ -7,15 +7,15 @@ entity ServoPWM is
 		clk : in  STD_LOGIC;
 		reset : in  STD_LOGIC;
 		posicion : in  STD_LOGIC_VECTOR (6 downto 0);
-		servo : out  STD_LOGIC
+		pwm : out  STD_LOGIC
 );			  
 end ServoPWM;
 
 architecture Behavioral of ServoPWM is
 	signal count : unsigned (10 downto 0);
-	signal pwm : unsigned (7 downto 0);
+	signal pwm_signal : unsigned (7 downto 0);
 begin
-	pwm <= unsigned('0' & posicion) + 16;
+	pwm_signal <= unsigned('0' & posicion) + 16;
 	counter : process (reset, clk) 
 		 begin
 			  if (reset = '1') then
@@ -28,5 +28,5 @@ begin
 					end if;
 			  end if;
     end process;
-    servo <= '1' when (count < pwm) else '0';
+    pwm <= '1' when (count < pwm_signal) else '0';
 end Behavioral;

@@ -7,7 +7,7 @@ entity HCSR04 is
 		clk : in  STD_LOGIC;
 		echo : in  STD_LOGIC;
 		trig : out  STD_LOGIC;
-		obstacle : out STD_LOGIC
+		distance : out natural
 	);
 end HCSR04;
 
@@ -30,19 +30,17 @@ component TriggerGenerator is
 	);
 end component;
 	signal echo_width : STD_LOGIC_VECTOR(21 downto 0);
+	signal reset_signal: STD_LOGIC;
 	signal trig_signal: STD_LOGIC;
-	signal echo_distance : positive;
+	signal echo_distance : natural;
 begin
-	pulse_in : counter generic map(22) port map(clk, echo, not(trig_signal), echo_width);
+	pulse_in : Counter generic map(22) port map(clk, echo, reset_signal, echo_width);
 	trig_generator : TriggerGenerator port map(clk, trig_signal);
-	obstacle_detection : process(echo_width, echo_distance)
+	process(echo_width, echo_distance)
 		begin
 			echo_distance <= to_integer(unsigned(echo_width));
-			if echo_distance < 55000 then
-				obstacle <= '1';
-			else
-				obstacle <= '0';
-			end if;
-		end process;
-		trig <= trig_signal;
+	end process;
+	distance <= echo_distance;
+	trig <= trig_signal;
+	reset_signal <= not(trig_signal);
 end Behavioral;

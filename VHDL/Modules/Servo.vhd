@@ -6,7 +6,7 @@ entity Servo is
 		clk : in STD_LOGIC;
 		reset : in STD_LOGIC;
 		position : in STD_LOGIC_VECTOR (6 downto 0);
-		servo : out STD_LOGIC
+		pwm : out STD_LOGIC
 	);
 end Servo;
 
@@ -26,11 +26,11 @@ component ServoPWM
 		clk : in STD_LOGIC;
 		reset : in STD_LOGIC;
 		posicion : in STD_LOGIC_VECTOR (6 downto 0);
-		servo : out  STD_LOGIC
+		pwm : out  STD_LOGIC
 	);
 end component;
-	signal timer_output : STD_LOGIC := '0';
+	signal pwm_output : STD_LOGIC := '0';
 begin
-	servo_pwm: ServoPWM port map(timer_output, reset, position, servo);
-	timer: Timer generic map(780) port map(clk, reset, timer_output);
+	servo_pwm: ServoPWM port map(pwm_output, reset, position, pwm);
+	pwm_timer: Timer generic map(780) port map(clk, reset, pwm_output);
 end Behavioral;
