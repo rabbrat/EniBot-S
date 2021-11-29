@@ -1,0 +1,11 @@
+NET "clk" LOC = "P56";
+
+NET "posicion<0>" LOC = "P114";
+NET "posicion<1>" LOC = "P117";
+NET "posicion<2>" LOC = "P116";
+NET "posicion<3>" LOC = "P119";
+NET "posicion<4>" LOC = "P118";
+NET "posicion<5>" LOC = "P121";
+NET "posicion<6>" LOC = "P120";
+NET "reset" LOC = "P79";
+NET "servo" LOC = "P78";
