@@ -29,7 +29,7 @@ end clock_181kHz;
 architecture Behavioral of clock_181kHz is
 
 SIGNAL TEMP: STD_LOGIC;
-SIGNAL CONTADOR : INTEGER RANGE 0 TO 390:= 0;--ESCALA (Fin\Fout )\2
+SIGNAL CONTADOR : INTEGER RANGE 0 TO 780:= 0;--ESCALA (Fin\Fout )\2
 
 begin
 	divisor : PROCESS (reset, entrada)
@@ -39,7 +39,7 @@ begin
 		CONTADOR <= 0;
 		
 		ELSIF RISING_EDGE (entrada) THEN
-			IF (CONTADOR =390) THEN
+			IF (CONTADOR =780) THEN
 			TEMP <= NOT(TEMP);
 			CONTADOR <=0;
 			ELSE 

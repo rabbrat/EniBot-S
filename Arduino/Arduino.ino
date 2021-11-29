@@ -1,4 +1,3 @@
-#include<LowPower.h>
 #include<Servo.h>
 
 // TURN-ON/OFF BUTTON
@@ -73,6 +72,7 @@ void setup() {
   // OUTPUT PIN DEFINITION
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(RADAR_SERVO_PIN, OUTPUT);
+  
   pinMode(ENABLE_B_PIN, OUTPUT);
   pinMode(IN_A1_PIN, OUTPUT);
   pinMode(IN_A2_PIN, OUTPUT);
@@ -94,46 +94,19 @@ void setup() {
 }
 
 void loop() {
-  
-  if(canceled) {
-    // Warning: Compatible only with ARDUINO MEGA 2560
-    LowPower.idle(SLEEP_FOREVER, ADC_OFF, TIMER5_ON, TIMER4_ON, TIMER3_ON, TIMER2_ON, TIMER1_ON, TIMER0_ON, SPI_OFF, USART3_OFF, USART2_OFF, USART1_OFF, USART0_OFF, TWI_OFF);
-  } else {
-    float distances[RADAR_READINGS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    getRadar(0, 180, distances);
-    printRadar(0, 180, distances, RADAR_READINGS);
-
-    int index = -1;
-    float least = -1;
-    for(int i = 0; i < RADAR_READINGS; i++) {
-      float distance = distances[i];
-      if(distance > MAX_RADAR_DISTANCE) continue;
-      else if(least = -1 || distance < least) {
-        index = i;
-        least = distance;
-      }
-    }
-    Serial.print("Least at index ");
-    Serial.print("(");
-    Serial.print(index);
-    Serial.print("): ");
-    Serial.println(least);
-
-    if(index == -1 && least == -1) {
-      moveRight();
-      delay(500);
-    } else if(index >= 5 || index <= 7) {
-      moveForward();
-      delay(150);
-    } else if(index < 5) {
-      moveRight();
-      delay(150);
-    } else if(index > 7) {
-      moveLeft();
-      delay(150);
-    } 
-  }
+  moveForward();
+  delay(4000);
+  brake();
+  delay(4000);
+  moveRight();
+  delay(4000);
+  brake();
+  moveLeft();
+  delay(4000);
+  brake();
+  moveBackward();
+  delay(4000);
+  brake();
 }
 
 float* getRadar(int startAngle, int endAngle, float* distances) {
@@ -168,6 +141,7 @@ float getUltrasonicDistance() {
   return pulseIn(ECHO_PIN, HIGH) / 58.2;
 }
 
+/*
 void brake() {
   for(int i = velocity; i > 0; i-=BRAKE_ACELERATION) {
     velocity = i;
@@ -206,47 +180,47 @@ void moveRight() {
     moveRight(velocity);
     delayMicroseconds(TURN_RIGHT_ACELERATION_DELAY);
   }
-}
+}*/
 
-void brake(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void brake() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, LOW);
 }
 
-void moveBackward(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveBackward() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, HIGH);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, HIGH);
 }
 
-void moveForward(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveForward() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, HIGH);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, HIGH);
   digitalWrite(IN_B2_PIN, LOW);
 }
 
-void moveLeft(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveLeft() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, HIGH);
   digitalWrite(IN_A2_PIN, LOW);
   digitalWrite(IN_B1_PIN, LOW);
   digitalWrite(IN_B2_PIN, HIGH);
 }
 
-void moveRight(int velocity) {
-  analogWrite(ENABLE_A_PIN, velocity);
-  analogWrite(ENABLE_B_PIN, velocity);
+void moveRight() {
+  digitalWrite(ENABLE_A_PIN, HIGH);
+  digitalWrite(ENABLE_B_PIN, HIGH);
   digitalWrite(IN_A1_PIN, LOW);
   digitalWrite(IN_A2_PIN, HIGH);
   digitalWrite(IN_B1_PIN, HIGH);

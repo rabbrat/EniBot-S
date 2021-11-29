@@ -39,20 +39,20 @@ architecture Behavioral of servo_pwm is
 	
 begin
 	
-	T_PWM <= UNSIGNED ('0' & posicion)+32;
+	T_PWM <= UNSIGNED ('0' & posicion)+16;
 	
 	 contador: PROCESS (reset, clk) begin
         if (reset = '1') then
            CNT <= (others => '0');
         elsif rising_edge(clk) then
-            if (CNT = 1279) then
+            if (CNT = 1280) then
                 CNT <= (others => '0');
             else
                 CNT <= CNT + 1;
             end if;
         end if;
     end process;
-    -- Señal de salida para el servomotor.
+    -- Seal de salida para el servomotor.
     servo <= '1' when (CNT < T_PWM) else '0';
 
 end Behavioral;
