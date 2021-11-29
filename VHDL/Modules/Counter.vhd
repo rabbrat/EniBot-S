@@ -3,13 +3,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity Counter is
-	 generic(n : positive := 10);
-    Port (
+	generic(n : positive := 10);
+	Port (
 		clk : in  STD_LOGIC;
-      enable : in  STD_LOGIC;
-      reset : in  STD_LOGIC;
-      output : out STD_LOGIC_VECTOR(n-1 downto 0)
-	 );
+		enable : in  STD_LOGIC;
+		reset : in  STD_LOGIC;
+		output : out STD_LOGIC_VECTOR(n-1 downto 0)
+	);
 end Counter;
 
 architecture Behavioral of Counter is

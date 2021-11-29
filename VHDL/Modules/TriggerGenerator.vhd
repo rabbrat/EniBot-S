@@ -2,20 +2,22 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 entity TriggerGenerator is
-    Port ( clk : in  STD_LOGIC;
-           trig : out  STD_LOGIC);
+	Port(
+		clk : in  STD_LOGIC;
+		trig : out  STD_LOGIC
+	);
 end TriggerGenerator;
 
 architecture Behavioral of TriggerGenerator is
 	
 component Counter is 
 	generic(n : positive := 10);
-	Port(
-		 clk : in STD_LOGIC;
-		 enable : in STD_LOGIC;
-		 reset : in STD_LOGIC;          
-		 output : out STD_LOGIC_VECTOR(n-1 downto 0)
-		);
+	Port (
+		clk : in STD_LOGIC;
+		enable : in STD_LOGIC;
+		reset : in STD_LOGIC;          
+		output : out STD_LOGIC_VECTOR(n-1 downto 0)
+	);
 end component;
 	signal output_signal : STD_LOGIC_VECTOR(23 downto 0);	
 	signal reset_signal : STD_LOGIC;
