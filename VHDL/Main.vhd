@@ -4,6 +4,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity Main is
 	Port (
 		clk : in  STD_LOGIC;
+		reset : in STD_LOGIC;
 		echo : in  STD_LOGIC;
 		trig : out  STD_LOGIC;
       led : out  STD_LOGIC;
@@ -16,6 +17,7 @@ architecture Behavioral of Main is
 component Radar is
     Port ( 
 			clk : in STD_LOGIC;
+			reset : in STD_LOGIC;
 			echo : in STD_LOGIC;
 			trig : out STD_LOGIC;
 			pwm : out STD_LOGIC

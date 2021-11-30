@@ -24,7 +24,7 @@ begin
 					if (count = 1280) then
 						 count <= (others => '0');
 					else
-						 count <=count + 1;
+						 count <= count + 1;
 					end if;
 			  end if;
     end process;
